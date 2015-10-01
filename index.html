@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<script src='js/lib/angular.min.js'></script>
+		<script src="js/main.js"></script>
+		<script></script>
+	</head>
+	<body ng-app="iphonotype" ng-controller="mainController as mc">
+		<div ng-switch="state">
+		
+			<div class="home_cont" ng-switch-when="home">
+				<div class="test_params">
+					Exposure time from
+					<input type="text" ng-model="min_time"/>
+					to <input type="text" ng-model="max_time"/> milliseconds
+					<button ng-click="mc.begin_test()">start</button>
+				</div>
+				<div class="print_params">
+					Print url <input type="text" ng-model="print_url"/>
+					Exposure time <input type="text" ng-model="exposure_time"/>
+					Delay <input type="text" ng-model="print_delay"/>
+					invert <input type="checkbox" ng-model="invert_print" />
+					<button ng-click="mc.begin_print()">start</button>
+				</div>
+			</div>
+			<div ng-switch-when="test">
+				<canvas id="screen"></canvas>
+			</div>
+		
+		</div>
+	</body>
+</html>
