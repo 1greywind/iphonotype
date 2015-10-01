@@ -1,31 +1,35 @@
 <html>
 	<head>
+		<link rel="stylesheet" href="css/main.css" type="text/css" />
 		<script src='js/lib/angular.min.js'></script>
 		<script src="js/main.js"></script>
 		<script></script>
 	</head>
 	<body ng-app="iphonotype" ng-controller="mainController as mc">
-		<div ng-switch="state">
-		
-			<div class="home_cont" ng-switch-when="home">
-				<div class="test_params">
-					Exposure time from
-					<input type="text" ng-model="min_time"/>
-					to <input type="text" ng-model="max_time"/> milliseconds
-					<button ng-click="mc.begin_test()">start</button>
-				</div>
-				<div class="print_params">
-					Print url <input type="text" ng-model="print_url"/>
-					Exposure time <input type="text" ng-model="exposure_time"/>
-					Delay <input type="text" ng-model="print_delay"/>
-					invert <input type="checkbox" ng-model="invert_print" />
-					<button ng-click="mc.begin_print()">start</button>
-				</div>
+		<div class="home_cont"  ng-show="state == 'home'">
+			<div class="test_params">
+				<h3>Test table params</h3>
+				<h5>Exposure time:</h5>
+				<div>from <input type="text" ng-model="min_time"/> ms</div>
+				<div>to <input type="text" ng-model="max_time"/> ms</div>
+				<div>number of steps <input type="text" ng-model="test_steps"/></div>
+				<div>margin <input type="text" ng-model="test_strip_margin"/>%</div>
+				<div>steps in scale <input type="text" ng-model="steps_in_scale"/></div>
+				<div>wait before test start<input type="text" ng-model="before_test_delay"/></div>
+				<div>wait after test end<input type="text" ng-model="after_test_delay"/></div>
+				<button ng-click="mc.begin_test()">start</button>
 			</div>
-			<div ng-switch-when="test">
-				<canvas id="screen"></canvas>
+			<div class="print_params">
+				<h3>Print params</h3>
+				<div>Print url <input type="text" ng-model="print_url"/></div>
+				<div>Exposure time <input type="text" ng-model="print_exposure_time"/></div>
+				<div>Delay <input type="text" ng-model="print_delay"/></div>
+				<div>invert <input type="checkbox" ng-model="invert_print" /></div>
+				<button ng-click="mc.begin_print()">start</button>
 			</div>
-		
+		</div>
+		<div ng-show="state == 'test'">
+			<canvas id="screen"></canvas>
 		</div>
 	</body>
 </html>

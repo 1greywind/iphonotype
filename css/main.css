@@ -1,0 +1,16 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: Arial, sans-serif;
+}
+
+.home_cont {
+}
+
+.test_params, .print_params {
+	width: 400px;
+	height: 300px;
+}
