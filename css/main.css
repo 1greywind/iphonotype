@@ -7,10 +7,38 @@ body {
 	font-family: Arial, sans-serif;
 }
 
+.light {
+	color: #000000;
+	background-color: #ffffff;
+}
+
+.dark, .dark input, .dark select {
+	color: #dd0000;
+	background-color: #000000;
+	border-color: #444444;
+}
+
+.dark button {
+	color: #ff0000;
+	background-color: #333333;
+	border-color: #444444;
+}
+
 .home_cont {
 }
 
 .test_params, .print_params {
 	width: 400px;
 	height: 300px;
+}
+
+.mode_cont li {
+	display: inline;
+	padding: 10px;
+	cursor: pointer;
+}
+
+.mode_cont li.selected {
+	text-decoration: underline;
+	cursor: none;
 }
