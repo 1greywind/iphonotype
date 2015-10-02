@@ -1,5 +1,21 @@
 angular.module('iphonotype', [])
-.controller('mainController', ['$scope', '$timeout', '$document', '$window', function($s, $t, $doc, $w){
+.service('sounds', function(){
+	
+	return {
+		clock: new Audio('files/snd/clock.wav'),
+		start: new Audio('files/snd/start.wav'),
+		ding: new Audio('files/snd/ding.wav'),
+		complete: new Audio('files/snd/end.wav'),
+		
+		stopAll: function() {
+			clock.pause()
+			complete.pause()
+			ding.pause()
+			start.pause()
+		}
+	}
+})
+.controller('mainController', ['$scope', '$timeout', '$document', '$window', 'sounds', function($s, $t, $doc, $w, sounds){
 	
 	$s.mode = "normal"
 	$s.state = "home"
@@ -9,8 +25,8 @@ angular.module('iphonotype', [])
 	$s.test_steps = 10
 	$s.test_strip_margin = 10
 	$s.steps_in_scale = 20
-	$s.before_test_delay = 5000
-	$s.after_test_delay = 5000
+	$s.before_test_delay = 4000
+	$s.after_test_delay = 3000
 	$s.table_style = 0
 	
 	$s.print_delay = 5000
@@ -27,6 +43,9 @@ angular.module('iphonotype', [])
 		var test_duration = drawing_methods[$s.table_style]()
 		
 		var delay = test_duration + $s.after_test_delay
+		
+		$t(function(){ sounds.start.play()}, $s.before_test_delay - 2000)
+		$t(function(){ sounds.complete.play()}, test_duration)
 		
 		$t(function() {
 			$s.state = "home"
@@ -46,6 +65,8 @@ angular.module('iphonotype', [])
 
 		var ctx	= canvas.getContext('2d')
 		ctx.strokeStyle = "rgb(0, 0, 0)"
+		ctx.font = "12px sans";
+		ctx.textAlign = "center"
 		ctx.clearRect(0, 0, canvas.width, canvas.height)
 		
 		var steps = $s.steps_in_scale
@@ -66,7 +87,7 @@ angular.module('iphonotype', [])
 			
 			var current_duration = duration_step*(i+1)
 			
-			var draw = draw_test_strip(ctx, start_x + (gap+step_w)*i, start_y, step_w, step_h, steps)
+			var draw = draw_test_strip(ctx, start_x + (gap+step_w)*i, start_y, step_w, step_h, steps, current_duration + " ms")
 			
 			var clear = function() {
 				ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -74,8 +95,6 @@ angular.module('iphonotype', [])
 			
 			$t(draw, delay)
 			$t(clear, delay + current_duration)
-			
-			console.log(duration_step, i, current_duration, delay, delay + current_duration)
 			
 			delay += current_duration
 		}
@@ -92,6 +111,8 @@ angular.module('iphonotype', [])
 
 		var ctx	= canvas.getContext('2d')
 		ctx.strokeStyle = "rgb(255, 255, 255)"
+		ctx.font = "12px sans";
+		ctx.textAlign = "center"
 		ctx.fillStyle = "rgb(0, 0, 0)"
 		ctx.fillRect(0, 0, canvas.width, canvas.height)
 		
@@ -113,7 +134,7 @@ angular.module('iphonotype', [])
 			
 			var current_duration = duration_step*(i+1)
 			
-			var draw = draw_test_strip(ctx, start_x + (gap+step_w)*i, start_y, step_w, step_h, steps)
+			var draw = draw_test_strip(ctx, start_x + (gap+step_w)*i, start_y, step_w, step_h, steps, current_duration + " ms")
 			
 			var clear = function() {
 				ctx.fillStyle = "rgb(0, 0, 0)"
@@ -123,24 +144,28 @@ angular.module('iphonotype', [])
 			$t(draw, delay)
 			$t(clear, delay + current_duration)
 			
-			console.log(duration_step, i, current_duration, delay, delay + current_duration)
-			
 			delay += current_duration
 		}
 		
 		return delay
 	}
 	
-	function draw_test_strip(ctx, x, y, step_w, step_h, steps) {
+	function draw_test_strip(ctx, x, y, step_w, step_h, steps, label) {
 		return function() {
+			
+			sounds.ding.play()
+
 			ctx.strokeRect(x, y, step_w, step_h*steps)
 			
 			for (var i=0; i<steps; i++) {
 				var val = Math.round((255/(steps-1))*i)
 				var color = "rgb($, $, $)".replace(/\$/g, val)
 				ctx.fillStyle = color
-				ctx.fillRect(x, y + step_h*i, step_w, step_h)
+				var ty = y + step_h*i
+				ctx.fillRect(x, ty, step_w, step_h)
 			}
+			
+			ctx.strokeText(label, x + step_w/2, ty + step_h + 20)
 		}
 	}
 }])
