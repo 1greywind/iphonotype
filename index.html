@@ -29,16 +29,18 @@
 				<div>table style <select ng-model="table_style"><option value="0" ng-selected="true">negative</option><option value="1" >positive</option></select></div>
 				<button ng-click="mc.begin_test()">start</button>
 			</div>
-			<div class="print_params">
+			<div class="print_params ng-dropdownList">
 				<h3>Print params</h3>
-				<div>Print url <input type="text" ng-model="print_url"/></div>
+				<div>Print url <input type="text" ng-model="print_url" recent-images/></div>
+				<div>Example images: <select ng-model="print_url"><option value="files/examples/tree.jpg">Black and White: Tree</option><option value="files/examples/stones.jpg">Color: Stones</option></select></div>
 				<div>Exposure time <input type="text" ng-model="print_exposure_time"/></div>
-				<div>Delay <input type="text" ng-model="print_delay"/></div>
+				<div>Delay before exposure <input type="text" ng-model="before_print_delay"/></div>
+				<div>Delay after exposure <input type="text" ng-model="after_print_delay"/></div>
 				<div>invert <input type="checkbox" ng-model="invert_print" /></div>
 				<button ng-click="mc.begin_print()">start</button>
 			</div>
 		</div>
-		<div ng-show="state == 'test'">
+		<div ng-show="state == 'screen'">
 			<canvas id="screen"></canvas>
 		</div>
 	</body>

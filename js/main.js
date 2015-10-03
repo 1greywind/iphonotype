@@ -29,7 +29,9 @@ angular.module('iphonotype', [])
 	$s.after_test_delay = 3000
 	$s.table_style = 0
 	
-	$s.print_delay = 5000
+	$s.print_url = ""
+	$s.before_print_delay = 5000
+	$s.after_print_delay = 5000
 	$s.print_exposure_time = 1000
 	
 	var drawing_methods = [draw_neg_test_table, draw_test_table]
@@ -39,7 +41,7 @@ angular.module('iphonotype', [])
 	}
 	
 	this.begin_test = function() {
-		$s.state = "test"
+		$s.state = "screen"
 		var test_duration = drawing_methods[$s.table_style]()
 		
 		var delay = test_duration + $s.after_test_delay
@@ -53,7 +55,62 @@ angular.module('iphonotype', [])
 	}
 	
 	this.begin_print = function() {
-				
+		
+		if ($s.print_url != "") {
+			
+			$s.state = "screen"
+			
+			load_image($s.print_url)
+		}
+		
+	}
+	
+	function load_image(url) {
+		var img = $doc[0].createElement("img")
+		img.src = url
+		img.onload = function() {
+			on_image_load(img)
+		}
+	}
+	
+	function on_image_load(img) {
+		var delay = $s.before_test_delay + $s.print_exposure_time + $s.after_test_delay
+		
+		$t(function(){ sounds.start.play()}, $s.before_test_delay - 2000)
+		$t(function(){ draw_neg_print_image(img)}, $s.before_test_delay)
+		$t(function(){ sounds.complete.play()}, $s.before_test_delay + $s.print_exposure_time)
+		
+		$t(function() {
+			$s.state = "home"
+		}, delay)
+	}
+	
+	function black_fill_canvas() {
+		var canvas = $doc[0].querySelector('#screen')
+		var ctx	= canvas.getContext('2d')
+		ctx.fillStyle = "rgb(0, 0, 0)"
+		ctx.fillRect(0, 0, canvas.width, canvas.height)
+	}
+	
+	function draw_neg_print_image(img) {
+		var canvas = $doc[0].querySelector('#screen')
+		
+		canvas.width = $w.innerWidth
+		canvas.height = $w.innerHeight
+
+		var ctx	= canvas.getContext('2d')
+		ctx.fillStyle = "rgb(0, 0, 0)"
+		ctx.fillRect(0, 0, canvas.width, canvas.height)
+		
+		var k = Math.min(canvas.width/img.width, canvas.height/img.height)
+		var w = img.width*k
+		var h = img.height*k
+		var x = (canvas.width - w)/2
+		var y = (canvas.height -h)/2
+		
+		ctx.drawImage(img, x, y, w, h)
+		
+		$t(black_fill_canvas, $s.print_exposure_time)
 	}
 
 	function draw_test_table() {
@@ -167,5 +224,23 @@ angular.module('iphonotype', [])
 			
 			ctx.strokeText(label, x + step_w/2, ty + step_h + 20)
 		}
+	}
+}])
+.directive('recentImages', ['$document', function($doc){
+	
+	return {
+		scope: {
+			selectedUrl: "=ngModel"
+		},
+		template: "<div>123</div>",
+		link: function($s, $el, $attr) {
+			
+			var cont = $doc[0].createElement('div')
+			
+			var elem = $el[0]
+			//elem.parentNode.insertBefore(cont, elem)
+			
+			console.log("link")
+		}		
 	}
 }])
