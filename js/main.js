@@ -33,6 +33,8 @@ angular.module('iphonotype', [])
 	$s.before_print_delay = 5000
 	$s.after_print_delay = 5000
 	$s.print_exposure_time = 1000
+	$s.grayscale_print = false
+	$s.invert_print = true
 	
 	var drawing_methods = [draw_neg_test_table, draw_test_table]
 	
@@ -77,7 +79,7 @@ angular.module('iphonotype', [])
 		var delay = $s.before_test_delay + $s.print_exposure_time + $s.after_test_delay
 		
 		$t(function(){ sounds.start.play()}, $s.before_test_delay - 2000)
-		$t(function(){ draw_neg_print_image(img)}, $s.before_test_delay)
+		$t(function(){ draw_print_image(img)}, $s.before_test_delay)
 		$t(function(){ sounds.complete.play()}, $s.before_test_delay + $s.print_exposure_time)
 		
 		$t(function() {
@@ -92,7 +94,7 @@ angular.module('iphonotype', [])
 		ctx.fillRect(0, 0, canvas.width, canvas.height)
 	}
 	
-	function draw_neg_print_image(img) {
+	function draw_print_image(img) {
 		var canvas = $doc[0].querySelector('#screen')
 		
 		canvas.width = $w.innerWidth
@@ -109,6 +111,18 @@ angular.module('iphonotype', [])
 		var y = (canvas.height -h)/2
 		
 		ctx.drawImage(img, x, y, w, h)
+		
+		var bitmapData = ctx.getImageData(x, y, w, h)
+		
+		if ($s.grayscale_print) {
+			grayscale(bitmapData)
+		}
+		
+		if ($s.invert_print) {
+			invert(bitmapData)
+		}
+		
+		ctx.putImageData(bitmapData, x, y);
 		
 		$t(black_fill_canvas, $s.print_exposure_time)
 	}
@@ -225,6 +239,25 @@ angular.module('iphonotype', [])
 			ctx.strokeText(label, x + step_w/2, ty + step_h + 20)
 		}
 	}
+	
+	function grayscale(bitmapData) {
+		var pixels = bitmapData.data;
+		for (var i = 0, n = pixels.length; i < n; i += 4) {
+			var grayscale = pixels[i] * .3 + pixels[i+1] * .59 + pixels[i+2] * .11;
+			pixels[i] = grayscale;
+			pixels[i+1] = grayscale;
+			pixels[i+2] = grayscale;
+		}
+	}
+
+	function invert(bitmapData) {
+		var pixels = bitmapData.data;
+		for (var i = 0; i < pixels.length; i += 4) {
+			pixels[i]   = 255 - pixels[i];   // red
+			pixels[i+1] = 255 - pixels[i+1]; // green
+			pixels[i+2] = 255 - pixels[i+2]; // blue
+		}
+	} 
 }])
 .directive('recentImages', ['$document', function($doc){
 	

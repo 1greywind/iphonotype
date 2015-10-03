@@ -32,11 +32,22 @@
 			<div class="print_params ng-dropdownList">
 				<h3>Print params</h3>
 				<div>Print url <input type="text" ng-model="print_url" recent-images/></div>
-				<div>Example images: <select ng-model="print_url"><option value="files/examples/tree.jpg">Black and White: Tree</option><option value="files/examples/stones.jpg">Color: Stones</option></select></div>
+				<div>Example images:
+					<select ng-model="print_url">
+						<option value="files/examples/tree.jpg">Black and White: Tree</option>
+						<option value="files/examples/evpatoria.jpg">Black and White: Evpatoria</option>
+						<option value="files/examples/rails.jpg">Black and White: Rails</option>
+						<option value="files/examples/tree2.jpg">Black and White: Tree surface</option>
+						<option value="files/examples/trees_and_water.jpg">Black and White: Trees over Water</option>
+						<option value="files/examples/trees_and_water2.jpg">Black and White: Trees over Water2</option>
+						<option value="files/examples/stones.jpg">Color: Stones</option>
+					</select>
+				</div>
 				<div>Exposure time <input type="text" ng-model="print_exposure_time"/></div>
 				<div>Delay before exposure <input type="text" ng-model="before_print_delay"/></div>
 				<div>Delay after exposure <input type="text" ng-model="after_print_delay"/></div>
 				<div>invert <input type="checkbox" ng-model="invert_print" /></div>
+				<div>grayscale <input type="checkbox" ng-model="grayscale_print" /></div>
 				<button ng-click="mc.begin_print()">start</button>
 			</div>
 		</div>
