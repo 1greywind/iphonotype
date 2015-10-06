@@ -6,53 +6,67 @@
 		<script src="js/main.js"></script>
 		<script></script>
 	</head>
-	<body ng-app="iphonotype" ng-controller="mainController as mc" ng-class="{light: mode=='normal', dark: mode=='dark'}">
-		<div class="home_cont"  ng-show="state == 'home'">
+	<body ng-app="iphonotype" ng-controller="mainController as mc" ng-class="{light: state.mode=='normal', dark: state.mode=='dark'}">
+		<div class="home_cont"  ng-show="state.state == 'home'">
 		
 			<div class="mode_cont">
 				<ul>
-					<li ng-click="mc.set_mode('normal')" ng-class="{selected: mode=='normal'}">Normal</li>
-					<li ng-click="mc.set_mode('dark')" ng-class="{selected: mode=='dark'}">Dark Room</li>
+					<li ng-click="mc.set_mode('normal')" ng-class="{selected: state.mode=='normal'}">Normal</li>
+					<li ng-click="mc.set_mode('dark')" ng-class="{selected: state.mode=='dark'}">Dark Room</li>
 				</ul>
 			</div>
 
 			<div class="test_params">
 				<h3>Test table params</h3>
 				<h5>Exposure time:</h5>
-				<div>from <input type="text" ng-model="min_time"/> ms</div>
-				<div>to <input type="text" ng-model="max_time"/> ms</div>
-				<div>number of steps <input type="text" ng-model="test_steps"/></div>
-				<div>margin <input type="text" ng-model="test_strip_margin"/>%</div>
-				<div>steps in scale <input type="text" ng-model="steps_in_scale"/></div>
-				<div>wait before test start<input type="text" ng-model="before_test_delay"/></div>
-				<div>wait after test end<input type="text" ng-model="after_test_delay"/></div>
-				<div>table style <select ng-model="table_style"><option value="0" ng-selected="true">negative</option><option value="1" >positive</option></select></div>
+				<div>from <input type="text" ng-model="state.min_time"/> ms</div>
+				<div>to <input type="text" ng-model="state.max_time"/> ms</div>
+				<div>number of steps <input type="text" ng-model="state.test_steps"/></div>
+				<div>margin <input type="text" ng-model="state.test_strip_margin"/>%</div>
+				<div>steps in scale <input type="text" ng-model="state.steps_in_scale"/></div>
+				<div>wait before test start<input type="text" ng-model="state.before_test_delay"/></div>
+				<div>wait after test end<input type="text" ng-model="state.after_test_delay"/></div>
+				<div>table style <select ng-model="state.table_style"><option value="0" ng-selected="true">negative</option><option value="1" >positive</option></select></div>
 				<button ng-click="mc.begin_test()">start</button>
 			</div>
 			<div class="print_params ng-dropdownList">
 				<h3>Print params</h3>
-				<div>Print url <input type="text" ng-model="print_url" recent-images/></div>
+				<div>Print url <input type="text" ng-model="state.print_url" recent-images/></div>
 				<div>Example images:
-					<select ng-model="print_url">
-						<option value="files/examples/tree.jpg">Black and White: Tree</option>
-						<option value="files/examples/evpatoria.jpg">Black and White: Evpatoria</option>
-						<option value="files/examples/rails.jpg">Black and White: Rails</option>
-						<option value="files/examples/tree2.jpg">Black and White: Tree surface</option>
-						<option value="files/examples/trees_and_water.jpg">Black and White: Trees over Water</option>
-						<option value="files/examples/trees_and_water2.jpg">Black and White: Trees over Water2</option>
-						<option value="files/examples/stones.jpg">Color: Stones</option>
+					<select ng-model="state.example_id">
+						<option ng-repeat="itm in state.examples track by $index" value="{{itm.id}}">{{itm.id}}</option>
 					</select>
 				</div>
-				<div>Exposure time <input type="text" ng-model="print_exposure_time"/></div>
-				<div>Delay before exposure <input type="text" ng-model="before_print_delay"/></div>
-				<div>Delay after exposure <input type="text" ng-model="after_print_delay"/></div>
-				<div>invert <input type="checkbox" ng-model="invert_print" /></div>
-				<div>grayscale <input type="checkbox" ng-model="grayscale_print" /></div>
+				<div>Exposure time <input type="text" ng-model="state.print_exposure_time"/></div>
+				<div>Delay before exposure <input type="text" ng-model="state.before_print_delay"/></div>
+				<div>Delay after exposure <input type="text" ng-model="state.after_print_delay"/></div>
+				<div>invert <input type="checkbox" ng-model="state.invert_print" /></div>
+				<div>grayscale <input type="checkbox" ng-model="state.grayscale_print" /></div>
 				<button ng-click="mc.begin_print()">start</button>
 			</div>
 		</div>
-		<div ng-show="state == 'screen'">
+		<div ng-show="state.state == 'screen'">
 			<canvas id="screen"></canvas>
+		</div>
+		
+		<div style="visibility: hidden; overflow: hidden; width: 0px; height: 0px">
+			<img id='curves_admiralt' src='files/examples/curves_admiralt.jpg' />
+			<img id='curves_door' src='files/examples/curves_door.jpg' />
+			<img id='curves_evpatoria' src='files/examples/curves_evpatoria.jpg' />
+			<img id='curves_isakiy' src='files/examples/curves_isakiy.jpg' />
+			<img id='curves_rails' src='files/examples/curves_rails.jpg' />
+			<img id='curves_stones' src='files/examples/curves_stones.jpg' />
+			<img id='curves_tree' src='files/examples/curves_tree.jpg' />
+			<img id='curves_tree2_' src='files/examples/curves_tree2.jpg' />
+			<img id='curves_trees_and_water' src='files/examples/curves_trees_and_water.jpg' />
+			<img id='curves_trees_and_water2' src='files/examples/curves_trees_and_water2.jpg' />
+			<img id='evpatoria' src='files/examples/evpatoria.jpg' />
+			<img id='rails' src='files/examples/rails.jpg' />
+			<img id='stones' src='files/examples/stones.jpg' />
+			<img id='tree' src='files/examples/tree.jpg' />
+			<img id='tree2' src='files/examples/tree2.jpg' />
+			<img id='trees_and_water' src='files/examples/trees_and_water.jpg' />
+			<img id='trees_and_water2' src='files/examples/trees_and_water2.jpg' />
 		</div>
 	</body>
 </html>

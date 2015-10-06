@@ -15,54 +15,105 @@ angular.module('iphonotype', [])
 		}
 	}
 })
-.controller('mainController', ['$scope', '$timeout', '$document', '$window', 'sounds', function($s, $t, $doc, $w, sounds){
+.service('state', function(){
+	return {
+		
+		examples: [
+			{src: "files/examples/curves_admiralt.jpg", id: 'curves_admiralt' },
+			{src: "files/examples/curves_door.jpg", id: 'curves_door' },
+			{src: "files/examples/curves_evpatoria.jpg", id: 'curves_evpatoria' },
+			{src: "files/examples/curves_isakiy.jpg", id: 'curves_isakiy' },
+			{src: "files/examples/curves_rails.jpg", id: 'curves_rails' },
+			{src: "files/examples/curves_stones.jpg", id: 'curves_stones' },
+			{src: "files/examples/curves_tree.jpg", id: 'curves_tree' },
+			{src: "files/examples/curves_tree2.jpg", id: 'curves_tree2' },
+			{src: "files/examples/curves_trees_and_water.jpg", id: 'curves_trees_and_water' },
+			{src: "files/examples/curves_trees_and_water2.jpg", id: 'curves_trees_and_water2' },
+			{src: "files/examples/evpatoria.jpg", id: 'evpatoria' },
+			{src: "files/examples/rails.jpg", id: 'rails' },
+			{src: "files/examples/stones.jpg", id: 'stones' },
+			{src: "files/examples/tree.jpg", id: 'tree' },
+			{src: "files/examples/tree2.jpg", id: 'tree2' },
+			{src: "files/examples/trees_and_water.jpg", id: 'trees_and_water' },
+			{src: "files/examples/trees_and_water2.jpg", id: 'trees_and_water2' }
+		],
+		
+		mode: "normal",
+		state: "home",
+		invert_print:  true,
+		min_time:  1,
+		max_time:  1001,
+		test_steps:  10,
+		test_strip_margin:  10,
+		steps_in_scale:  20,
+		before_test_delay:  4000,
+		after_test_delay:  3000,
+		table_style:  0,
+		
+		print_url:  "",
+		before_print_delay:  5000,
+		after_print_delay:  5000,
+		print_exposure_time:  1000,
+		grayscale_print:  false,
+		invert_print:  true
+	}
 	
-	$s.mode = "normal"
-	$s.state = "home"
-	$s.invert_print = true
-	$s.min_time = 1
-	$s.max_time = 1001
-	$s.test_steps = 10
-	$s.test_strip_margin = 10
-	$s.steps_in_scale = 20
-	$s.before_test_delay = 4000
-	$s.after_test_delay = 3000
-	$s.table_style = 0
+})
+.controller('mainController', ['$scope', 'state', '$timeout', '$document', '$window', 'sounds', function($s, st, $t, $doc, $w, sounds){
 	
-	$s.print_url = ""
-	$s.before_print_delay = 5000
-	$s.after_print_delay = 5000
-	$s.print_exposure_time = 1000
-	$s.grayscale_print = false
-	$s.invert_print = true
+	$s.state = st
+	st.mode = "normal"
+	st.state = "home"
+	st.invert_print = true
+	st.min_time = 1
+	st.max_time = 1001
+	st.test_steps = 10
+	st.test_strip_margin = 10
+	st.steps_in_scale = 20
+	st.before_test_delay = 4000
+	st.after_test_delay = 3000
+	st.table_style = 0
+	
+	st.print_url = ""
+	st.before_print_delay = 5000
+	st.after_print_delay = 5000
+	st.print_exposure_time = 1000
+	st.grayscale_print = false
+	st.invert_print = true
 	
 	var drawing_methods = [draw_neg_test_table, draw_test_table]
 	
 	this.set_mode = function(mode) {
-		$s.mode = mode
+		st.mode = mode
 	}
 	
 	this.begin_test = function() {
-		$s.state = "screen"
-		var test_duration = drawing_methods[$s.table_style]()
+		st.state = "screen"
+		var test_duration = drawing_methods[st.table_style]()
 		
-		var delay = test_duration + $s.after_test_delay
+		var delay = test_duration + st.after_test_delay
 		
-		$t(function(){ sounds.start.play()}, $s.before_test_delay - 2000)
+		$t(function(){ sounds.start.play()}, st.before_test_delay - 2000)
 		$t(function(){ sounds.complete.play()}, test_duration)
 		
 		$t(function() {
-			$s.state = "home"
+			st.state = "home"
 		}, delay)
 	}
 	
 	this.begin_print = function() {
 		
-		if ($s.print_url != "") {
+		if (st.print_url != "") {
 			
-			$s.state = "screen"
+			st.state = "screen"
 			
-			load_image($s.print_url)
+			load_image(st.print_url)
+		}
+		else if (st.example_id != "") {
+			
+			st.state = "screen"
+
+			on_image_load($doc[0].getElementById(st.example_id))
 		}
 		
 	}
@@ -76,14 +127,32 @@ angular.module('iphonotype', [])
 	}
 	
 	function on_image_load(img) {
-		var delay = $s.before_test_delay + $s.print_exposure_time + $s.after_test_delay
+		var delay = st.before_test_delay + st.print_exposure_time + st.after_test_delay
 		
-		$t(function(){ sounds.start.play()}, $s.before_test_delay - 2000)
-		$t(function(){ draw_print_image(img)}, $s.before_test_delay)
-		$t(function(){ sounds.complete.play()}, $s.before_test_delay + $s.print_exposure_time)
+		var b = function(){
+			
+			sounds.start.removeEventListener("ended", b)
+			
+			draw_print_image(img)
+			
+			$t(function(){
+				
+				black_fill_canvas()
+				sounds.complete.play()
+				
+				$t(function() {
+					st.state = "home"
+				}, st.after_print_delay)
+				
+			}, st.print_exposure_time)
+		}
+		
+		$t(function(){ sounds.start.play()}, st.before_test_delay - 1000)
+		sounds.start.addEventListener("ended", b)
+
 		
 		$t(function() {
-			$s.state = "home"
+			st.state = "home"
 		}, delay)
 	}
 	
@@ -114,17 +183,15 @@ angular.module('iphonotype', [])
 		
 		var bitmapData = ctx.getImageData(x, y, w, h)
 		
-		if ($s.grayscale_print) {
+		if (st.grayscale_print) {
 			grayscale(bitmapData)
 		}
 		
-		if ($s.invert_print) {
+		if (st.invert_print) {
 			invert(bitmapData)
 		}
 		
 		ctx.putImageData(bitmapData, x, y);
-		
-		$t(black_fill_canvas, $s.print_exposure_time)
 	}
 
 	function draw_test_table() {
@@ -140,8 +207,8 @@ angular.module('iphonotype', [])
 		ctx.textAlign = "center"
 		ctx.clearRect(0, 0, canvas.width, canvas.height)
 		
-		var steps = $s.steps_in_scale
-		var fraction = $s.test_strip_margin/100
+		var steps = st.steps_in_scale
+		var fraction = st.test_strip_margin/100
 		var table_width = canvas.width * (1 - fraction)
 		var table_height = canvas.height * (1 - fraction)
 		var start_x = canvas.width * fraction/2
@@ -149,12 +216,12 @@ angular.module('iphonotype', [])
 		var step_h = (table_height/steps)
 		var step_w = step_h
 		
-		var delay = $s.after_test_delay
-		var duration_step = ($s.max_time - $s.min_time)/$s.test_steps
+		var delay = st.after_test_delay
+		var duration_step = (st.max_time - st.min_time)/st.test_steps
 		
-		var gap = (table_width - step_w * $s.test_steps) / ($s.test_steps - 1)
+		var gap = (table_width - step_w * st.test_steps) / (st.test_steps - 1)
 		
-		for (var i=0; i<$s.test_steps; i++) {
+		for (var i=0; i<st.test_steps; i++) {
 			
 			var current_duration = duration_step*(i+1)
 			
@@ -187,8 +254,8 @@ angular.module('iphonotype', [])
 		ctx.fillStyle = "rgb(0, 0, 0)"
 		ctx.fillRect(0, 0, canvas.width, canvas.height)
 		
-		var steps = $s.steps_in_scale
-		var fraction = $s.test_strip_margin/100
+		var steps = st.steps_in_scale
+		var fraction = st.test_strip_margin/100
 		var table_width = canvas.width * (1 - fraction)
 		var table_height = canvas.height * (1 - fraction)
 		var start_x = canvas.width * fraction/2
@@ -196,12 +263,12 @@ angular.module('iphonotype', [])
 		var step_h = (table_height/steps)
 		var step_w = step_h
 		
-		var delay = $s.after_test_delay
-		var duration_step = ($s.max_time - $s.min_time)/$s.test_steps
+		var delay = st.after_test_delay
+		var duration_step = (st.max_time - st.min_time)/st.test_steps
 		
-		var gap = (table_width - step_w * $s.test_steps) / ($s.test_steps - 1)
+		var gap = (table_width - step_w * st.test_steps) / (st.test_steps - 1)
 		
-		for (var i=0; i<$s.test_steps; i++) {
+		for (var i=0; i<st.test_steps; i++) {
 			
 			var current_duration = duration_step*(i+1)
 			
